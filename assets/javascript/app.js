@@ -15,10 +15,6 @@ $(document).ready(function() {
 
     // Get inputs
     $('#submit').on('click', function(event) {
-        alert('Train added');
-        // prevent default to avoid refreshing
-        event.preventDefault();
-
         // get name
         var name = $('#inputName').val();
 
@@ -30,7 +26,7 @@ $(document).ready(function() {
 
         // get frequency
         var frequency = $('#inputFrequency').val();
-        
+
         // push to Firebase
         database.ref().push({
             name: name,
