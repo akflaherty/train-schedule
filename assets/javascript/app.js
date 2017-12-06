@@ -18,14 +18,19 @@ $(document).ready(function() {
         alert('Train added');
         // prevent default to avoid refreshing
         event.preventDefault();
+
         // get name
         var name = $('#inputName').val();
+
         // get destination
         var destination = $('#inputDestination').val();
+
         // get time of first train
         var startTime = $('#inputStartTime').val();
+
         // get frequency
         var frequency = $('#inputFrequency').val();
+        
         // push to Firebase
         database.ref().push({
             name: name,
@@ -43,21 +48,25 @@ $(document).ready(function() {
         var trainName = childSnapshot.val().name;
         var $nameCell = $('<td></td>').text(trainName);
         $newRow.append($nameCell);
+
         // destination
         var trainDestination = childSnapshot.val().destination;
         var $destinationCell = $('<td></td>').text(trainDestination);
         $newRow.append($destinationCell);
+
         // frequency
         var trainFreq = childSnapshot.val().frequency;
         var $freqCell = $('<td></td>').text(trainFreq);
         $newRow.append($freqCell);
+
         // next arrival
         var trainStart = childSnapshot.val().start;
         var trainNext = findNext(trainStart, trainFreq);
-        var $nextCell = $('<td></td>').text(trainNext);
+        var $nextCell = $('<td></td>').text(moment(trainNext).format("hh:mm"));
         $newRow.append($nextCell);
+
         // wait time 
-        var trainWait;
+        var trainWait = trainNext.diff(moment(), 'minutes');
         var $waitCell = $('<td></td>').text(trainWait);
         $newRow.append($waitCell);
 
@@ -65,6 +74,25 @@ $(document).ready(function() {
     })
 
     function findNext(start, freq) {
+        var currentTime = moment();
+        // console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
 
+        var startTimeConverted = moment(start, "hh:mm").subtract(1, "years");
+        // console.log(startTimeConverted);
+
+        var diffTime = moment().diff(moment(startTimeConverted), "minutes");
+        // console.log("DIFFERENCE IN TIME: " + diffTime);
+
+        // Time apart (remainder)
+        var tRemainder = diffTime % freq;
+
+        // Minute Until Train
+        var tMinutesTillTrain = freq - tRemainder;
+        // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+        // Next Train
+        var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+        // console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+        return nextTrain;
     }
 })
